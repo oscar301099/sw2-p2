@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pasajero {
+  id     String        @id @default(uuid())
+  name   String
+  ventas VentaBoleto[]
+}
+
+model Gasto {
+  id          String   @id @default(uuid())
+  descripcion String
+  monto       Float
+  fecha       DateTime @default(now())
+}
+
+model Conductor {
+  id     String @id @default(uuid())
+  name   String
+  sueldo Float
+  buses  Bus[]
+}
+
+model Bus {
+  id          String    @id @default(uuid())
+  placa       String
+  idConductor String
+  boletos     Boleto[]
+  conductor   Conductor @relation(fields: [idConductor], references: [id])
+}
+
+model Boleto {
+  id     String        @id @default(uuid())
+  idBus  String
+  bus    Bus           @relation(fields: [idBus], references: [id])
+  ventas VentaBoleto[]
+}
+
+model VentaBoleto {
+  id         String   @id @default(uuid())
+  idBoleto   String
+  idPasajero String
+  precio     Float
+  fechaVenta DateTime @default(now())
+  boleto     Boleto   @relation(fields: [idBoleto], references: [id])
+  pasajero   Pasajero @relation(fields: [idPasajero], references: [id])
+}
